@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/mupdf.iml" filepath="$PROJECT_DIR$/.idea/mupdf.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mupdf-1.19.0-source/platform/java/platform.iml" filepath="$PROJECT_DIR$/mupdf-1.19.0-source/platform/java/platform.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mupdf-1.19.0-source/platform/platform1.iml" filepath="$PROJECT_DIR$/mupdf-1.19.0-source/platform/platform1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mupdf-1.19.0-source/thirdparty/thirdparty.iml" filepath="$PROJECT_DIR$/mupdf-1.19.0-source/thirdparty/thirdparty.iml" />
+    </modules>
+  </component>
+</project>

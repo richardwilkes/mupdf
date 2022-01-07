@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="fuzzing">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/mupdf-1.19.0-source/thirdparty/leptonica/prog/fuzzing/barcode_fuzzer_seed_corpus.zip!/" />
+      <root url="jar://$PROJECT_DIR$/mupdf-1.19.0-source/thirdparty/leptonica/prog/fuzzing/pixa_recog_fuzzer_seed_corpus.zip!/" />
+      <root url="jar://$PROJECT_DIR$/mupdf-1.19.0-source/thirdparty/leptonica/prog/fuzzing/general_corpus.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
