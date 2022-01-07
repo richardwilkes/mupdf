@@ -77,7 +77,7 @@ if [ ! -e mupdf-${MUPDF_VERSION}-source.tar.xz ]; then
 fi
 
 if [ ! -e ${MUPDF_SRC} ]; then
-  tar xzf ${MUPDF_SRC}.tar.xz
+  tar xf ${MUPDF_SRC}.tar.xz
 fi
 
 /bin/rm -rf ${MUPDF_DIST} \
