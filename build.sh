@@ -120,6 +120,7 @@ make OS=${OS} \
   HAVE_WIN32=no \
   OUT=build \
   XCFLAGS="${XCFLAGS}" \
+  ${EXTRA_BUILD_FLAGS} \
   prefix=${MUPDF_DIST} \
   generate \
   libs
