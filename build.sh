@@ -2,6 +2,7 @@
 set -eo pipefail
 
 MUPDF_VERSION=1.19.0
+BASE_DIR=$(realpath .)
 MUPDF_SRC=mupdf-${MUPDF_VERSION}-source
 MUPDF_DIST=$(realpath dist)
 
@@ -33,44 +34,46 @@ if [ "$CLEAN"x == "restorex" ]; then
   exit 0
 fi
 
+case $(uname -m) in
+x86_64*)
+  ARCH=amd64
+  export MACOSX_DEPLOYMENT_TARGET=10.13
+  ;;
+arm*)
+  ARCH=arm64
+  export MACOSX_DEPLOYMENT_TARGET=11
+  ;;
+*)
+  echo "Unsupported architecture"
+  false
+  ;;
+esac
+
 case $(uname -s) in
 Darwin*)
   OS_TYPE=darwin
-  ORIG_LIB_NAME=libmupdf.a
-  ORIG_LIB_NAME_THIRD=libmupdf-third.a
-  case $(uname -m) in
-  x86_64*)
-    DEST_LIB_NAME=libmupdf_darwin_amd64.a
-    DEST_LIB_NAME_THIRD=libmupdftp_darwin_amd64.a
-    export MACOSX_DEPLOYMENT_TARGET=10.13
-    ;;
-  arm*)
-    DEST_LIB_NAME=libmupdf_darwin_arm64.a
-    DEST_LIB_NAME_THIRD=libmupdftp_darwin_arm64.a
-    export MACOSX_DEPLOYMENT_TARGET=11
-    ;;
-  esac
+  OS=darwin
   XCFLAGS=-mmacosx-version-min=${MACOSX_DEPLOYMENT_TARGET}
   ;;
 Linux*)
   OS_TYPE=linux
-  ORIG_LIB_NAME=libmupdf.a
-  ORIG_LIB_NAME_THIRD=libmupdf-third.a
-  DEST_LIB_NAME=libmupdf_linux.a
-  DEST_LIB_NAME_THIRD=libmupdftp_linux.a
+  OS=linux
   ;;
 MINGW*)
   OS_TYPE=windows
-  ORIG_LIB_NAME=libmupdf.a
-  ORIG_LIB_NAME_THIRD=libmupdf-third.a
-  DEST_LIB_NAME=libmupdf_windows.a
-  DEST_LIB_NAME_THIRD=libmupdftp_windows.a
+  OS=mingw64
+  EXTRA_BUILD_FLAGS="CC=gcc"
   ;;
 *)
   echo "Unsupported OS"
   false
   ;;
 esac
+
+ORIG_LIB_NAME=libmupdf.a
+ORIG_LIB_NAME_THIRD=libmupdf-third.a
+DEST_LIB_NAME=libmupdf_${OS_TYPE}_${ARCH}.a
+DEST_LIB_NAME_THIRD=libmupdftp_${OS_TYPE}_${ARCH}.a
 
 if [ ! -e mupdf-${MUPDF_VERSION}-source.tar.xz ]; then
   curl https://mupdf.com/downloads/archive/${MUPDF_SRC}.tar.xz -o ${MUPDF_SRC}.tar.xz
@@ -86,7 +89,15 @@ fi
   ${MUPDF_SRC}/resources/fonts/noto \
   ${MUPDF_SRC}/resources/fonts/sil
 
-mkdir -p ${MUPDF_DIST}
+# This is necessary for Windows, which can't handle the long command lines that are generated, so we are shortening them
+cd ${MUPDF_SRC}
+for f in $(grep -rl 'thirdparty' .); do
+  sed -i '' -e 's/thirdparty/tp/g' $f
+done
+if [ -e thirdparty ]; then
+  mv thirdparty tp
+fi
+cd ..
 
 XCFLAGS="${XCFLAGS} \
   -DFZ_ENABLE_SPOT_RENDERING=0 \
@@ -103,11 +114,28 @@ XCFLAGS="${XCFLAGS} \
   -DTOFU_CJK"
 
 cd ${MUPDF_SRC}
-make HAVE_X11=no \
+make OS=${OS} \
+  HAVE_X11=no \
   HAVE_GLUT=no \
+  HAVE_WIN32=no \
+  OUT=build \
   XCFLAGS="${XCFLAGS}" \
   prefix=${MUPDF_DIST} \
   generate \
-  install
-mv ${MUPDF_DIST}/lib/${ORIG_LIB_NAME} ${MUPDF_DIST}/lib/${DEST_LIB_NAME}
-mv ${MUPDF_DIST}/lib/${ORIG_LIB_NAME_THIRD} ${MUPDF_DIST}/lib/${DEST_LIB_NAME_THIRD}
+  libs
+cd ..
+
+mkdir -p ${MUPDF_DIST}/lib
+cp -R ${MUPDF_SRC}/include ${MUPDF_DIST}
+/bin/rm -rf ${MUPDF_DIST}/include/mupdf/helpers
+cd ${MUPDF_DIST}/lib
+mkdir mupdf
+cd mupdf
+ar -x ${BASE_DIR}/${MUPDF_SRC}/build/libmupdf.a
+cd ${MUPDF_DIST}/lib
+mkdir tp
+cd tp
+ar -x ${BASE_DIR}/${MUPDF_SRC}/build/libmupdf-third.a
+cd ${MUPDF_DIST}/lib
+ar -r libmupdf_${OS_TYPE}_${ARCH}.a mupdf/* tp/*
+/bin/rm -rf mupdf tp
