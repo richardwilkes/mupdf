@@ -92,7 +92,7 @@ fi
 # This is necessary for Windows, which can't handle the long command lines that are generated, so we are shortening them
 cd ${MUPDF_SRC}
 for f in $(grep -rl 'thirdparty' .); do
-  sed -i '' -e 's/thirdparty/tp/g' $f
+  sed -i -e 's/thirdparty/tp/g' $f
 done
 if [ -e thirdparty ]; then
   mv thirdparty tp
