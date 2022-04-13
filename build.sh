@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 set -eo pipefail
 
-MUPDF_VERSION=1.19.0
+MUPDF_VERSION=1.19.1
 BASE_DIR=$(realpath .)
 MUPDF_SRC=mupdf-${MUPDF_VERSION}-source
 MUPDF_DIST=$(realpath dist)
@@ -37,7 +37,7 @@ fi
 case $(uname -m) in
 x86_64*)
   ARCH=amd64
-  export MACOSX_DEPLOYMENT_TARGET=10.13
+  export MACOSX_DEPLOYMENT_TARGET=10.14
   ;;
 arm*)
   ARCH=arm64
