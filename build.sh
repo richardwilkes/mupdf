@@ -49,6 +49,7 @@ arm*)
   ;;
 esac
 
+MAKE=make
 case $(uname -s) in
 Darwin*)
   OS_TYPE=darwin
@@ -63,6 +64,7 @@ MINGW*)
   OS_TYPE=windows
   OS=mingw64
   EXTRA_BUILD_FLAGS="CC=gcc"
+  MAKE=mingw32-make
   ;;
 *)
   echo "Unsupported OS"
@@ -114,7 +116,7 @@ XCFLAGS="${XCFLAGS} \
   -DTOFU_CJK"
 
 cd ${MUPDF_SRC}
-make OS=${OS} \
+$MAKE OS=${OS} \
   HAVE_X11=no \
   HAVE_GLUT=no \
   HAVE_WIN32=no \
