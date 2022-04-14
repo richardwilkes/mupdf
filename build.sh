@@ -95,7 +95,7 @@ cd ${MUPDF_SRC}
 # Renaming thirdparty to tp is necessary for Windows, which can't handle the long command lines that are generated, so
 # we are shortening them
 for f in $(grep -rl --exclude '*.o' --exclude '*.a' 'thirdparty' .); do
-  sed -i "" -e 's/thirdparty/tp/g' $f
+  sed -i"" -e 's/thirdparty/tp/g' $f
 done
 if [ -e thirdparty ]; then
   mv thirdparty tp
@@ -103,19 +103,19 @@ fi
 # The following renames are here to avoid collisions with a different version of the jpeg library that the skia project
 # pulls in
 for f in $(grep -rl --exclude '*.o' --exclude '*.a' 'jpeg_' .); do
-  sed -i "" -e 's/jpeg_/jpegx_/g' $f
+  sed -i"" -e 's/jpeg_/jpegx_/g' $f
 done
 for f in $(grep -rl --exclude '*.o' --exclude '*.a' 'jinit_' .); do
-  sed -i "" -e 's/jinit_/jinitx_/g' $f
+  sed -i"" -e 's/jinit_/jinitx_/g' $f
 done
 for f in $(grep -rl --exclude '*.o' --exclude '*.a' 'jcopy_' .); do
-  sed -i "" -e 's/jcopy_/jcopyx_/g' $f
+  sed -i"" -e 's/jcopy_/jcopyx_/g' $f
 done
 for f in $(grep -rl --exclude '*.o' --exclude '*.a' 'jround_up' .); do
-  sed -i "" -e 's/jround_up/jroundx_up/g' $f
+  sed -i"" -e 's/jround_up/jroundx_up/g' $f
 done
 for f in $(grep -rl --exclude '*.o' --exclude '*.a' 'jdiv_round_up' .); do
-  sed -i "" -e 's/jdiv_round_up/jdivx_round_up/g' $f
+  sed -i"" -e 's/jdiv_round_up/jdivx_round_up/g' $f
 done
 cd ..
 
