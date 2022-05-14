@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 set -eo pipefail
 
-MUPDF_VERSION=1.19.1
+MUPDF_VERSION=1.20.0-rc1
 BASE_DIR=$(realpath .)
 MUPDF_SRC=mupdf-${MUPDF_VERSION}-source
 MUPDF_DIST=$(realpath dist)
@@ -25,7 +25,7 @@ for arg in "$@"; do
 done
 
 if [ "$CLEAN"x == "fullx" ]; then
-  /bin/rm -rf mupdf-*-source.tar.xz mupdf-*-source ${MUPDF_DIST}
+  /bin/rm -rf mupdf-*-source* ${MUPDF_DIST}
   exit 0
 fi
 
@@ -77,12 +77,12 @@ ORIG_LIB_NAME_THIRD=libmupdf-third.a
 DEST_LIB_NAME=libmupdf_${OS_TYPE}_${ARCH}.a
 DEST_LIB_NAME_THIRD=libmupdftp_${OS_TYPE}_${ARCH}.a
 
-if [ ! -e mupdf-${MUPDF_VERSION}-source.tar.xz ]; then
-  curl https://mupdf.com/downloads/archive/${MUPDF_SRC}.tar.xz -o ${MUPDF_SRC}.tar.xz
+if [ ! -e mupdf-${MUPDF_VERSION}-source.tgz ]; then
+  curl https://mupdf.com/downloads/archive/${MUPDF_SRC}.tar.gz -o ${MUPDF_SRC}.tgz
 fi
 
 if [ ! -e ${MUPDF_SRC} ]; then
-  tar xf ${MUPDF_SRC}.tar.xz
+  tar xzf ${MUPDF_SRC}.tgz
 fi
 
 /bin/rm -rf ${MUPDF_DIST} \
@@ -134,7 +134,7 @@ XCFLAGS="${XCFLAGS} \
   -DTOFU_CJK"
 
 cd ${MUPDF_SRC}
-$MAKE OS=${OS} \
+$MAKE -j OS=${OS} \
   HAVE_X11=no \
   HAVE_GLUT=no \
   HAVE_WIN32=no \
