@@ -37,7 +37,7 @@ fi
 case $(uname -m) in
 x86_64*)
   ARCH=amd64
-  export MACOSX_DEPLOYMENT_TARGET=10.13
+  export MACOSX_DEPLOYMENT_TARGET=10.14
   ;;
 arm*)
   ARCH=arm64
