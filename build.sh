@@ -54,7 +54,7 @@ case $(uname -s) in
 Darwin*)
   OS_TYPE=darwin
   OS=darwin
-  XCFLAGS=-mmacosx-version-min=${MACOSX_DEPLOYMENT_TARGET}
+  XCFLAGS="-mmacosx-version-min=${MACOSX_DEPLOYMENT_TARGET} -fno-common"
   ;;
 Linux*)
   OS_TYPE=linux
@@ -154,10 +154,12 @@ cd ${MUPDF_DIST}/lib
 mkdir mupdf
 cd mupdf
 ar -x ${BASE_DIR}/${MUPDF_SRC}/build/libmupdf.a
+/bin/rm -f __*
 cd ${MUPDF_DIST}/lib
 mkdir tp
 cd tp
 ar -x ${BASE_DIR}/${MUPDF_SRC}/build/libmupdf-third.a
+/bin/rm -f __*
 cd ${MUPDF_DIST}/lib
 ar -r libmupdf_${OS_TYPE}_${ARCH}.a mupdf/* tp/*
 /bin/rm -rf mupdf tp
