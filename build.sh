@@ -1,10 +1,10 @@
 #! /usr/bin/env bash
 set -eo pipefail
 
-MUPDF_VERSION=1.20.3
+MUPDF_VERSION=1.22.2
 BASE_DIR=$(realpath .)
 MUPDF_SRC=mupdf-${MUPDF_VERSION}-source
-MUPDF_DIST=$(realpath dist)
+MUPDF_DIST=${BASE_DIR}/dist
 
 for arg in "$@"; do
   case "$arg" in
