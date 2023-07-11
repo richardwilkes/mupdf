@@ -82,7 +82,7 @@ if [ ! -e mupdf-${MUPDF_VERSION}-source.tgz ]; then
 fi
 
 if [ ! -e ${MUPDF_SRC} ]; then
-  tar xzf ${MUPDF_SRC}.tgz
+  tar xzf ${MUPDF_SRC}.tgz || tar xzf ${MUPDF_SRC}.tgz # try twice, for Windows and symlinks
 fi
 
 /bin/rm -rf ${MUPDF_DIST} \
