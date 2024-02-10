@@ -55,19 +55,16 @@ Darwin*)
   OS_TYPE=darwin
   OS=darwin
   XCFLAGS="-mmacosx-version-min=${MACOSX_DEPLOYMENT_TARGET} -fno-common"
-  SED_INPLACE="sed -i ''"
   ;;
 Linux*)
   OS_TYPE=linux
   OS=linux
-  SED_INPLACE="sed -i=''"
   ;;
 MINGW*)
   OS_TYPE=windows
   OS=mingw64
   EXTRA_BUILD_FLAGS="CC=gcc"
   MAKE=mingw32-make
-  SED_INPLACE="sed -i=''"
   ;;
 *)
   echo "Unsupported OS"
@@ -95,10 +92,17 @@ fi
   ${MUPDF_SRC}/resources/fonts/sil
 
 cd ${MUPDF_SRC}
+function sed_inplace() {
+  if [ $OS == "darwin" ]; then
+    sed -i "" -e "$1" "$2"
+  else
+    sed -i"" -e "$1" "$2"
+  fi
+}
 # Renaming thirdparty to tp is necessary for Windows, which can't handle the long command lines that are generated, so
 # we are shortening them
 for f in $(grep -rl --exclude '*.o' --exclude '*.a' 'thirdparty' .); do
-  $SED_INPLACE -e 's/thirdparty/tp/g' $f
+  sed_inplace 's/thirdparty/tp/g' $f
 done
 if [ -e thirdparty ]; then
   mv thirdparty tp
@@ -106,22 +110,22 @@ fi
 # The following renames are here to avoid collisions with a different version of the jpeg library that the skia project
 # pulls in
 for f in $(grep -rl --exclude '*.o' --exclude '*.a' 'jpeg_' .); do
-  $SED_INPLACE -e 's/jpeg_/jpegx_/g' $f
+  sed_inplace 's/jpeg_/jpegx_/g' $f
 done
 for f in $(grep -rl --exclude '*.o' --exclude '*.a' 'jinit_' .); do
-  $SED_INPLACE -e 's/jinit_/jinitx_/g' $f
+  sed_inplace 's/jinit_/jinitx_/g' $f
 done
 for f in $(grep -rl --exclude '*.o' --exclude '*.a' 'jcopy_' .); do
-  $SED_INPLACE -e 's/jcopy_/jcopyx_/g' $f
+  sed_inplace 's/jcopy_/jcopyx_/g' $f
 done
 for f in $(grep -rl --exclude '*.o' --exclude '*.a' 'jround_up' .); do
-  $SED_INPLACE -e 's/jround_up/jroundx_up/g' $f
+  sed_inplace 's/jround_up/jroundx_up/g' $f
 done
 for f in $(grep -rl --exclude '*.o' --exclude '*.a' 'jdiv_round_up' .); do
-  $SED_INPLACE -e 's/jdiv_round_up/jdivx_round_up/g' $f
+  sed_inplace 's/jdiv_round_up/jdivx_round_up/g' $f
 done
 # This is causing errors on macOS where the options have been removed, so eliminate as we don't really need it
-$SED_INPLACE -e 's/\$(LDREMOVEUNREACH) -Wl,-s//g' Makerules
+sed_inplace 's/\$(LDREMOVEUNREACH) -Wl,-s//g' Makerules
 cd ..
 
 XCFLAGS="${XCFLAGS} \
