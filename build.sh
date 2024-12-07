@@ -55,16 +55,19 @@ Darwin*)
 	OS_TYPE=darwin
 	OS=darwin
 	XCFLAGS="-mmacosx-version-min=${MACOSX_DEPLOYMENT_TARGET} -fno-common"
+	CORES=$(nproc)
 	;;
 Linux*)
 	OS_TYPE=linux
 	OS=linux
+	CORES=$(nproc)
 	;;
 MINGW*)
 	OS_TYPE=windows
 	OS=mingw64
 	EXTRA_BUILD_FLAGS="CC=gcc"
 	MAKE=mingw32-make
+	CORES=1
 	;;
 *)
 	echo "Unsupported OS"
@@ -149,7 +152,7 @@ XCFLAGS="${XCFLAGS} \
   -DTOFU_CJK"
 
 cd ${MUPDF_SRC}
-$MAKE -j 4 OS=${OS} \
+$MAKE -j ${CORES} OS=${OS} \
 	HAVE_X11=no \
 	HAVE_GLUT=no \
 	HAVE_WIN32=no \
