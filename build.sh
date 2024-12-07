@@ -149,7 +149,7 @@ XCFLAGS="${XCFLAGS} \
   -DTOFU_CJK"
 
 cd ${MUPDF_SRC}
-$MAKE -j $(nproc) OS=${OS} \
+$MAKE -j 4 OS=${OS} \
 	HAVE_X11=no \
 	HAVE_GLUT=no \
 	HAVE_WIN32=no \
