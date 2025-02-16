@@ -66,6 +66,8 @@ MINGW*)
 	OS_TYPE=windows
 	OS=mingw64
 	EXTRA_BUILD_FLAGS="CC=gcc"
+	# The skew/deskew logic doesn't compile right on mingw without disabling these intrinsics
+	XCFLAGS="-DARCH_HAS_NEON=0 -DARCH_HAS_SSE=0"
 	MAKE=mingw32-make
 	CORES=1
 	;;
@@ -129,6 +131,8 @@ for f in $(grep -rl --exclude '*.o' --exclude '*.a' 'jdiv_round_up' .); do
 done
 # This is causing errors on macOS where the options have been removed, so eliminate as we don't really need it
 sed_inplace 's/\$(LDREMOVEUNREACH) -Wl,-s//g' Makerules
+# This is causing errors on Windows, so change it back to the older style
+sed_inplace 's/Ui64$/ULL/' source/fitz/time.c
 cd ..
 
 XCFLAGS="${XCFLAGS} \
