@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 set -eo pipefail
 
-MUPDF_VERSION=1.25.4
+MUPDF_VERSION=1.26.11
 BASE_DIR=$(realpath .)
 MUPDF_SRC=mupdf-${MUPDF_VERSION}-source
 MUPDF_DIST=${BASE_DIR}/dist
@@ -83,7 +83,7 @@ DEST_LIB_NAME=libmupdf_${OS_TYPE}_${ARCH}.a
 DEST_LIB_NAME_THIRD=libmupdftp_${OS_TYPE}_${ARCH}.a
 
 if [ ! -e mupdf-${MUPDF_VERSION}-source.tgz ]; then
-	curl https://mupdf.com/downloads/archive/${MUPDF_SRC}.tar.gz -o ${MUPDF_SRC}.tgz
+	curl --location https://mupdf.com/downloads/archive/${MUPDF_SRC}.tar.gz -o ${MUPDF_SRC}.tgz
 fi
 
 if [ ! -e ${MUPDF_SRC} ]; then
@@ -94,7 +94,16 @@ fi
 	${MUPDF_SRC}/resources/fonts/droid \
 	${MUPDF_SRC}/resources/fonts/han \
 	${MUPDF_SRC}/resources/fonts/noto \
-	${MUPDF_SRC}/resources/fonts/sil
+	${MUPDF_SRC}/resources/fonts/sil \
+	${MUPDF_SRC}/source/fitz/memento.c \
+	${MUPDF_SRC}/platform/gl \
+	${MUPDF_SRC}/platform/x11 \
+	${MUPDF_SRC}/thirdparty/curl \
+	${MUPDF_SRC}/thirdparty/freetype/src/tools \
+	${MUPDF_SRC}/thirdparty/zxing-cpp \
+	${MUPDF_SRC}/thirdparty/extract/src/memento.c \
+	${MUPDF_SRC}/thirdparty/jbig2dec/memento.c \
+	${MUPDF_SRC}/thirdparty/libjpeg/cdjepg.c
 
 cd ${MUPDF_SRC}
 function sed_inplace() {
