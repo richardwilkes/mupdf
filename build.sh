@@ -30,7 +30,7 @@ if [ "$CLEAN"x == "fullx" ]; then
 fi
 
 if [ "$CLEAN"x == "restorex" ]; then
-	/bin/rm -rf ${MUPDF_DIST} mupdf-*-source/build
+	/bin/rm -rf ${MUPDF_DIST} mupdf-*-source/build mupdf-*-source/b
 	exit 0
 fi
 
@@ -87,7 +87,7 @@ if [ ! -e mupdf-${MUPDF_VERSION}-source.tgz ]; then
 fi
 
 if [ ! -e ${MUPDF_SRC} ]; then
-	tar xzf ${MUPDF_SRC}.tgz || tar xzf ${MUPDF_SRC}.tgz # try twice, for Windows and symlinks
+	tar xzf ${MUPDF_SRC}.tgz || true # Windows will generate errors due to symlinks, but we don't care about those
 fi
 
 /bin/rm -rf ${MUPDF_DIST} \
@@ -170,7 +170,7 @@ $MAKE -j ${CORES} OS=${OS} \
 	HAVE_GLUT=no \
 	HAVE_WIN32=no \
 	USE_SYSTEM_LIBS=no \
-	OUT=build \
+	OUT=b \
 	XCFLAGS="${XCFLAGS}" \
 	${EXTRA_BUILD_FLAGS} \
 	prefix=${MUPDF_DIST} \
@@ -184,12 +184,12 @@ cp -R ${MUPDF_SRC}/include ${MUPDF_DIST}
 cd ${MUPDF_DIST}/lib
 mkdir mupdf
 cd mupdf
-ar -x ${BASE_DIR}/${MUPDF_SRC}/build/libmupdf.a
+ar -x ${BASE_DIR}/${MUPDF_SRC}/b/libmupdf.a
 /bin/rm -f __*
 cd ${MUPDF_DIST}/lib
 mkdir tp
 cd tp
-ar -x ${BASE_DIR}/${MUPDF_SRC}/build/libmupdf-third.a
+ar -x ${BASE_DIR}/${MUPDF_SRC}/b/libmupdf-third.a
 /bin/rm -f __*
 cd ${MUPDF_DIST}/lib
 ar -r libmupdf_${OS_TYPE}_${ARCH}.a mupdf/* tp/*
