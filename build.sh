@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 set -eo pipefail
 
-MUPDF_VERSION=1.26.11
+MUPDF_VERSION=1.27.2
 BASE_DIR=$(realpath .)
 MUPDF_SRC=mupdf-${MUPDF_VERSION}-source
 MUPDF_DIST=${BASE_DIR}/dist
@@ -37,11 +37,9 @@ fi
 case $(uname -m) in
 x86_64*)
 	ARCH=amd64
-	export MACOSX_DEPLOYMENT_TARGET=10.15
 	;;
 arm*)
 	ARCH=arm64
-	export MACOSX_DEPLOYMENT_TARGET=11
 	;;
 *)
 	echo "Unsupported architecture"
@@ -52,6 +50,7 @@ esac
 MAKE=make
 case $(uname -s) in
 Darwin*)
+	export MACOSX_DEPLOYMENT_TARGET=11
 	OS_TYPE=darwin
 	OS=darwin
 	XCFLAGS="-mmacosx-version-min=${MACOSX_DEPLOYMENT_TARGET} -fno-common"
