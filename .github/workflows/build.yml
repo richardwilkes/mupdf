@@ -24,21 +24,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Set up Go
-        uses: actions/setup-go@v6
-        with:
-          go-version-file: go.mod
-          cache: true
-
-      - name: Install Linux dependencies
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends pkg-config
-
       # The default mingw gcc on the Windows/ARM64 runner is an x86_64 build that
-      # emits x86 assembly, so cgo fails to assemble runtime/cgo's gcc_arm64.S.
-      # Install a native aarch64 llvm-mingw toolchain and point cgo's CC at it.
+      # emits x86 code, so it can't produce a native arm64 library. Install a
+      # native aarch64 llvm-mingw toolchain and point build.sh's CC at it.
       - name: Install Windows ARM64 toolchain
         if: runner.os == 'Windows' && runner.arch == 'ARM64'
         env:
@@ -51,13 +39,12 @@ jobs:
           echo "$RUNNER_TEMP/$name/bin" >> "$GITHUB_PATH"
           echo "CC=aarch64-w64-mingw32-gcc" >> "$GITHUB_ENV"
 
-      # The race detector isn't supported on windows/arm64, so run the tests
-      # without it there (--lint --test instead of --all).
+      # Build the MuPDF C library into dist/.
       - name: Build
         run: ./build.sh
 
-      # Map the runner's OS/arch onto Go's GOOS/GOARCH naming so the artifact
-      # name matches the conventions used elsewhere (e.g. darwin/amd64).
+      # Map the runner's OS/arch onto the same naming build.sh uses for the
+      # library file (e.g. darwin/amd64) so the artifact name matches.
       - name: Resolve platform and arch
         id: platform
         run: |
@@ -75,7 +62,7 @@ jobs:
           echo "platform=$platform" >> "$GITHUB_OUTPUT"
           echo "arch=$arch" >> "$GITHUB_OUTPUT"
 
-      - name: Upload example artifact
+      - name: Upload library artifact
         uses: actions/upload-artifact@v7
         with:
           name: libmupdf_${{ steps.platform.outputs.platform }}_${{ steps.platform.outputs.arch }}

@@ -64,7 +64,9 @@ Linux*)
 MINGW*)
 	OS_TYPE=windows
 	OS=mingw64
-	EXTRA_BUILD_FLAGS="CC=gcc"
+	# Honor an externally-provided CC (e.g. a native aarch64-w64-mingw32-gcc on Windows/ARM64, where the default mingw
+	# gcc is an x86_64 build); fall back to gcc otherwise.
+	EXTRA_BUILD_FLAGS="CC=${CC:-gcc}"
 	# The skew/deskew logic doesn't compile right on mingw without disabling these intrinsics
 	XCFLAGS="-DARCH_HAS_NEON=0 -DARCH_HAS_SSE=0"
 	MAKE=mingw32-make
