@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 set -eo pipefail
 
-MUPDF_VERSION=1.26.11
+MUPDF_VERSION=1.27.2
 BASE_DIR=$(realpath .)
 MUPDF_SRC=mupdf-${MUPDF_VERSION}-source
 MUPDF_DIST=${BASE_DIR}/dist
@@ -35,13 +35,11 @@ if [ "$CLEAN"x == "restorex" ]; then
 fi
 
 case $(uname -m) in
-x86_64*)
+x86_64*|amd64*)
 	ARCH=amd64
-	export MACOSX_DEPLOYMENT_TARGET=10.15
 	;;
-arm*)
+aarch64*|arm64*)
 	ARCH=arm64
-	export MACOSX_DEPLOYMENT_TARGET=11
 	;;
 *)
 	echo "Unsupported architecture"
@@ -52,10 +50,11 @@ esac
 MAKE=make
 case $(uname -s) in
 Darwin*)
+	export MACOSX_DEPLOYMENT_TARGET=11
 	OS_TYPE=darwin
 	OS=darwin
 	XCFLAGS="-mmacosx-version-min=${MACOSX_DEPLOYMENT_TARGET} -fno-common"
-	CORES=$(nproc)
+	CORES=$(sysctl -n hw.ncpu)
 	;;
 Linux*)
 	OS_TYPE=linux
@@ -65,11 +64,13 @@ Linux*)
 MINGW*)
 	OS_TYPE=windows
 	OS=mingw64
-	EXTRA_BUILD_FLAGS="CC=gcc"
+	# Honor an externally-provided CC (e.g. a native aarch64-w64-mingw32-gcc on Windows/ARM64, where the default mingw
+	# gcc is an x86_64 build); fall back to gcc otherwise.
+	EXTRA_BUILD_FLAGS="CC=${CC:-gcc}"
 	# The skew/deskew logic doesn't compile right on mingw without disabling these intrinsics
 	XCFLAGS="-DARCH_HAS_NEON=0 -DARCH_HAS_SSE=0"
 	MAKE=mingw32-make
-	CORES=1
+	CORES=${NUMBER_OF_PROCESSORS:-1}
 	;;
 *)
 	echo "Unsupported OS"

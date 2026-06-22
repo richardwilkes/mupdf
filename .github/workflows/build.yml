@@ -1,0 +1,70 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-22.04-arm, macos-26-intel, macos-26, windows-2022, windows-11-arm]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # The default mingw gcc on the Windows/ARM64 runner is an x86_64 build that
+      # emits x86 code, so it can't produce a native arm64 library. Install a
+      # native aarch64 llvm-mingw toolchain and point build.sh's CC at it.
+      - name: Install Windows ARM64 toolchain
+        if: runner.os == 'Windows' && runner.arch == 'ARM64'
+        env:
+          LLVM_MINGW_VERSION: "20260616"
+        run: |
+          name="llvm-mingw-${LLVM_MINGW_VERSION}-ucrt-aarch64"
+          curl -fsSL -o "$RUNNER_TEMP/$name.zip" \
+            "https://github.com/mstorsjo/llvm-mingw/releases/download/${LLVM_MINGW_VERSION}/$name.zip"
+          7z x "$RUNNER_TEMP/$name.zip" -o"$RUNNER_TEMP" >/dev/null
+          echo "$RUNNER_TEMP/$name/bin" >> "$GITHUB_PATH"
+          echo "CC=aarch64-w64-mingw32-gcc" >> "$GITHUB_ENV"
+
+      # Build the MuPDF C library into dist/.
+      - name: Build
+        run: ./build.sh
+
+      # Map the runner's OS/arch onto the same naming build.sh uses for the
+      # library file (e.g. darwin/amd64) so the artifact name matches.
+      - name: Resolve platform and arch
+        id: platform
+        run: |
+          case "$RUNNER_OS" in
+            Linux) platform=linux ;;
+            macOS) platform=darwin ;;
+            Windows) platform=windows ;;
+            *) echo "unknown OS: $RUNNER_OS" >&2; exit 1 ;;
+          esac
+          case "$RUNNER_ARCH" in
+            X64) arch=amd64 ;;
+            ARM64) arch=arm64 ;;
+            *) echo "unknown arch: $RUNNER_ARCH" >&2; exit 1 ;;
+          esac
+          echo "platform=$platform" >> "$GITHUB_OUTPUT"
+          echo "arch=$arch" >> "$GITHUB_OUTPUT"
+
+      - name: Upload library artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: libmupdf_${{ steps.platform.outputs.platform }}_${{ steps.platform.outputs.arch }}
+          path: dist/
+          if-no-files-found: error
