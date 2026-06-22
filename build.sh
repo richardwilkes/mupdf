@@ -35,10 +35,10 @@ if [ "$CLEAN"x == "restorex" ]; then
 fi
 
 case $(uname -m) in
-x86_64*)
+x86_64*|amd64*)
 	ARCH=amd64
 	;;
-arm*)
+aarch64*|arm64*)
 	ARCH=arm64
 	;;
 *)
