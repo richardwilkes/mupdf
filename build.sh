@@ -54,7 +54,7 @@ Darwin*)
 	OS_TYPE=darwin
 	OS=darwin
 	XCFLAGS="-mmacosx-version-min=${MACOSX_DEPLOYMENT_TARGET} -fno-common"
-	CORES=$(nproc)
+	CORES=$(sysctl -n hw.ncpu)
 	;;
 Linux*)
 	OS_TYPE=linux
@@ -70,7 +70,7 @@ MINGW*)
 	# The skew/deskew logic doesn't compile right on mingw without disabling these intrinsics
 	XCFLAGS="-DARCH_HAS_NEON=0 -DARCH_HAS_SSE=0"
 	MAKE=mingw32-make
-	CORES=1
+	CORES=${NUMBER_OF_PROCESSORS:-1}
 	;;
 *)
 	echo "Unsupported OS"
