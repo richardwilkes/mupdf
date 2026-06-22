@@ -34,7 +34,12 @@ if [ "$CLEAN"x == "restorex" ]; then
 	exit 0
 fi
 
-case $(uname -m) in
+# Determine the target architecture from the compiler rather than `uname -m`.
+# On the Windows/ARM64 runner the MSYS `uname` is an x86_64 binary running under
+# emulation and reports x86_64, which would misname the arm64 library. Querying
+# the compiler (honoring an externally-provided CC, e.g. aarch64-w64-mingw32-gcc)
+# yields the real target triple.
+case $(${CC:-gcc} -dumpmachine) in
 x86_64*|amd64*)
 	ARCH=amd64
 	;;
